@@ -1,0 +1,200 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI-Assisted Lab Port Scanner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Tailwind via CDN for quick styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-950 text-slate-100 min-h-screen">
+    <div class="min-h-screen flex flex-col">
+      <!-- Header / Nav -->
+      <header
+        class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-20"
+      >
+        <div
+          class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between"
+        >
+          <div class="flex items-center gap-2">
+            <span
+              class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500/10 border border-sky-500/40"
+            >
+              ⚡
+            </span>
+            <div>
+              <h1 class="text-lg font-semibold">
+                AI Lab Port Scanner
+              </h1>
+              <p class="text-xs text-slate-400">
+                Safe, quick TCP scan for <span class="font-mono">{{ target }}</span>
+              </p>
+            </div>
+          </div>
+          <span class="text-xs text-slate-500">
+            Lab use only · Authorized targets only
+          </span>
+        </div>
+      </header>
+
+      <!-- Main content -->
+      <main class="flex-1">
+        <div class="max-w-5xl mx-auto px-4 py-8 grid lg:grid-cols-[3fr,2fr] gap-6">
+          <!-- Left column: controls + results -->
+          <section class="space-y-4">
+            <!-- Scanner card -->
+            <div
+              class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/40"
+            >
+              <div class="flex items-center justify-between gap-3 mb-3">
+                <div>
+                  <h2 class="text-base font-semibold">
+                    Scan Configuration
+                  </h2>
+                  <p class="text-xs text-slate-400">
+                    Non-intrusive TCP connect scan of top 100 ports with light service detection.
+                  </p>
+                </div>
+                <span
+                  class="inline-flex text-[10px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40"
+                >
+                  AI Assisted
+                </span>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-3 text-sm">
+                <div
+                  class="bg-slate-950/60 border border-slate-800 rounded-xl p-3 flex flex-col gap-1"
+                >
+                  <span class="text-[11px] uppercase tracking-wide text-slate-400">
+                    Lab Target (fixed)
+                  </span>
+                  <span class="font-mono text-xs bg-slate-900/90 px-2 py-1 rounded-lg">
+                    {{ target }}
+                  </span>
+                  <span class="text-[11px] text-slate-500">
+                    Target is hard-coded server-side. UI cannot change this.
+                  </span>
+                </div>
+
+                <div
+                  class="bg-slate-950/60 border border-slate-800 rounded-xl p-3 flex flex-col gap-1"
+                >
+                  <span class="text-[11px] uppercase tracking-wide text-slate-400">
+                    Scan Profile
+                  </span>
+                  <ul class="text-[11px] space-y-0.5 text-slate-300">
+                    <li><span class="font-mono text-[11px]">nmap</span> -T4 --top-ports 100</li>
+                    <li><span class="font-mono text-[11px]">-sT -sV --version-light -Pn</span></li>
+                    <li>Quick &amp; light lab reconnaissance only</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="mt-4 flex items-center justify-between gap-3">
+                <button
+                  id="scan-btn"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-sky-500 hover:bg-sky-400 text-slate-950 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <span id="scan-btn-spinner" class="hidden animate-spin text-xs">
+                    ⟳
+                  </span>
+                  <span id="scan-btn-text">Run Scan</span>
+                </button>
+                <p class="text-[11px] text-slate-500">
+                  Use only with approved lab targets. Respect your institution&apos;s AUP.
+                </p>
+              </div>
+            </div>
+
+            <!-- Results card -->
+            <div
+              class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/40"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <h2 class="text-base font-semibold">Scan Results</h2>
+                <span
+                  id="scan-status"
+                  class="text-[11px] text-slate-500"
+                >
+                  Waiting for scan…
+                </span>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table
+                  class="min-w-full text-xs text-left border-separate border-spacing-y-1"
+                >
+                  <thead class="text-[11px] uppercase text-slate-400">
+                    <tr>
+                      <th class="px-2 py-1">Port</th>
+                      <th class="px-2 py-1">Protocol</th>
+                      <th class="px-2 py-1">Service</th>
+                      <th class="px-2 py-1">Product / Version</th>
+                    </tr>
+                  </thead>
+                  <tbody id="results-body" class="align-top">
+                    <!-- Rows injected by JS -->
+                  </tbody>
+                </table>
+              </div>
+
+              <div
+                id="no-results"
+                class="text-xs text-slate-500 mt-3"
+              >
+                No scan has been run yet.
+              </div>
+            </div>
+          </section>
+
+          <!-- Right column: AI explanation / helper -->
+          <aside>
+            <div
+              class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-xl shadow-slate-950/40 h-full flex flex-col"
+            >
+              <div class="flex items-center gap-2 mb-3">
+                <div
+                  class="h-7 w-7 rounded-xl bg-sky-500/10 border border-sky-500/40 flex items-center justify-center text-xs"
+                >
+                  🤖
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold">AI Assistant Insight</h2>
+                  <p class="text-xs text-slate-400">
+                    Human-readable summary of the scan results.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                id="ai-summary"
+                class="text-xs text-slate-200 bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex-1 overflow-y-auto"
+              >
+                <p class="mb-2">
+                  Run a scan to see an AI-style explanation here. This helper
+                  does not attack the target — it just explains what the
+                  discovered ports and services might mean in a lab setting.
+                </p>
+                <ul class="list-disc ml-4 space-y-1 text-slate-400">
+                  <li>Identify common services (SSH, HTTP, HTTPS, etc.).</li>
+                  <li>Estimate the role of the host (web server, DB, etc.).</li>
+                  <li>Suggest safe next steps for authorized testing.</li>
+                </ul>
+              </div>
+
+              <p class="mt-3 text-[10px] text-slate-500">
+                This interface is for educational use in controlled lab
+                environments only. Do not scan systems you do not own or do not
+                have explicit permission to test.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
