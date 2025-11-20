@@ -18,3 +18,11 @@ The target host is fixed on the backend and cannot be changed from the UI.
 
   ```bash
   nmap -T4 --top-ports 100 -sT -sV --version-light -Pn -oX - <LAB_TARGET>
+
+---
+
+## Screenshot
+
+Below is a screenshot of the AI-Assisted Lab Port Scanner running against the approved lab target (Kali VM in this case):
+
+![Lab Port Scanner Screenshot](screenshot.png)
